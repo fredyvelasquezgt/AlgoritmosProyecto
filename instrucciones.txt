@@ -1,0 +1,89 @@
+COSAS A TOMAR EN CUENTA
+
+ * Una instruccion inicia se encuentra entre parentesis ()
+    ( <instruccion> )
+
+
+//VARIABLES
+
+- exit - finaliza el programa
+    (exit) 
+
+- help - Muestra todos los comandos disponibles y una explicación 
+    (help) 
+
+- SETQ -> Crear variables
+    (setQ <nombre> <valor> )
+
+- FIRST -> Devuelve el primer elemento en una lista
+    (fist <lista>) >> primer item
+
+- REST -> Devuelve la lista sin el primer elemento 
+    (rest <lista>) >> lista
+
+- SECOND, THIRTD -> Devuelven el segundo o tercer elemento de la lista
+    (second <lista>) >> lista
+    (thirtd <lista>) >> lista
+
+- NTH -> Devuelve el N elemento de la lista
+    (nth <expr> <lista>) >> item
+
+
+// LISTAS
+
+- CONS -> agrega un elemento al principio de una lista y la regresa
+    (const <expr> <lista>) >> lista
+
+- APPEND -> Devuelve la union de dos listas
+    (append <lista1> <lista2>) >> lista
+
+- LIST -> Construye una lista con los elementos que se le pasan
+    (list <expr1> ... <exprN>) >> lista
+    
+
+- LAST -> Devuelve el ultimo elemento de la lista
+    (last <lista>) >> item
+
+- REVERSE -> Le da vuelta a la lista
+    (reverse <lista>) >> lista
+
+// FUNCIONES
+
+
+- DEFUN -> Crea una funcion
+    (defun <nombre> <parametros> (<logica>))
+
+
+// CONDICIONALES
+
+- ECUALS -> Devuleve T o nil si dos ecuaciones son iguales
+    (ecuals <expr1> <expr2>) >> result
+
+- NOT, OR, AND
+
+- EVAL -> Devuleve el valor de "expr" (operacion)
+    (eval <expr>) >> valor
+
+- COND -> evalua todas sus condiciones y devulve la primera que encuentre T
+    (cond (<expr> <mensaje>)) >> mensaje
+
+    (defun notas n   (cond ((N 5) 'suspenso ) ((N 7) 'APROBADO) ( T 'Sobresaliente) )  )
+    (notas 10) >> sobresaliente
+    (notas 7) >> aprobado
+
+    
+
+
+// PREDICADOS
+
+
+
+- NULL -> Devuelve T si es null (nill) y nil si no
+    (null <expr>) >> result
+
+
+- ATOM -> Devuelve T si es un atomo y nil si no
+    (ATOM <expr>) >> result
+
+- NUMBERP -> Devuelve T si es un numero y nil si no
+    (numberp <expr>) >> result
