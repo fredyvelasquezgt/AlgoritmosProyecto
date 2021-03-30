@@ -12,6 +12,9 @@ COSAS A TOMAR EN CUENTA
 - help - Muestra todos los comandos disponibles y una explicación 
     (help) 
 
+- WRITE - imprime un mensaje en consola
+    (write <expr>)
+
 - SETQ -> Crear variables
     (setQ <nombre> <valor> )
 
@@ -71,7 +74,6 @@ COSAS A TOMAR EN CUENTA
     (notas 10) >> sobresaliente
     (notas 7) >> aprobado
 
-    
 
 
 // PREDICADOS

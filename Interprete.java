@@ -1,3 +1,4 @@
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -30,25 +31,19 @@ public class Interprete {
             String tempInstruccion = sc.nextLine().toLowerCase();
             instruccion += " " + tempInstruccion;
 
-            if (instruccion.equals(" (exit)")) {
-                estado = false;
-            } else {
+            int parentesisApertura = contarCaracteres(instruccion, '(');
+            int parentesisCierre = contarCaracteres(instruccion, ')');
 
-                int parentesisApertura = contarCaracteres(instruccion, '(');
-                int parentesisCierre = contarCaracteres(instruccion, ')');
+            // Ver si se ha completado la intruccion
+            if (parentesisApertura == parentesisCierre) {
 
-                // Ver si se ha completado la intruccion
-                if (parentesisApertura == parentesisCierre) {
-
-                    if (parentesisCierre > 0) {
-                        evaluar(instruccion);
-                    } else {
-                        vista.prinrErr(">> [!] Las intrucciones deben iniciar con '(' y finalizar con ')'");
-                    }
-
-                    instruccion = "";
+                if (parentesisCierre > 0) {
+                    evaluar(instruccion);
+                } else {
+                    vista.prinrErr(">> [!] Las intrucciones deben iniciar con '(' y finalizar con ')'");
                 }
 
+                instruccion = "";
             }
 
         }
@@ -68,31 +63,106 @@ public class Interprete {
         instruccion = instruccion.substring(1);
 
         // Preparar la cadena con cada comando
-        String[] lista = instruccion.split(" ");
+        // String[] lista = instruccion.split("(?=\\())");
+
+        instruccion = instruccion.replace("'(", "-");
+        String[] lista = instruccion.split("(?=\\()|(?=-)");
         for (int i = 0; i < lista.length; i++) {
 
             String comando = lista[i];
+            comando = comando.replace("-", "'(");
 
-            if (comando != "") {
-                System.out.println(comando.trim().toLowerCase());
 
-                switch (comando) {
-                case "setq": // Definir una variable (setq <nombre> <valor>)
-                    try {
-                        variables.add(new Variable(lista[i + 1], ""));
+            // Descomentar para ver como estan ordenados los comandos
+            // System.out.println(comando);
 
-                    } catch (Exception e) {
-                        vista.prinrErr("[!] Sintaxis incorrecta en el comando SETQ");
-                    }
+            // Ver el comando principal
+            switch (comando.split(" ")[0]) {
 
-                    break;
+            // Variables
+            case "exit":
+                break;
 
-                default:
-                    break;
-                }
+            case "help":
+                break;
+
+            case "write":
+                break;
+
+            case "setq":
+                break;
+
+            case "first":
+                break;
+
+            case "rest":
+                break;
+
+            case "second":
+                break;
+
+            case "thritd":
+                break;
+
+            case "nth":
+                break;
+
+            // Listas
+
+            case "cons":
+                break;
+
+            case "append":
+                break;
+
+            case "list":
+                break;
+
+            case "last":
+                break;
+
+            case "reverse":
+                break;
+
+            // Funciones
+
+            case "defun":
+                break;
+
+            // Condicionales
+
+            case "ecuals":
+                break;
+
+            case "eval":
+                break;
+
+            case "cond":
+                break;
+
+            // Predicados
+
+            case "null":
+                break;
+
+            case "atom":
+                break;
+
+            case "numberp":
+                break;
 
             }
+
         }
+
+    }
+
+    /*
+     * Guarda una variable en el programa
+     * 
+     * @param comando
+     */
+    public void guardar(String nombre, String valor) {
 
     }
 
