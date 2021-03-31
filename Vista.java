@@ -5,11 +5,11 @@ public class Vista {
     String reset = "\u001B[0m";
 
     public void prinrErr(String mensaje) {
-        System.out.print(red + mensaje + reset + "\n");
+        System.out.print(red + ">> " + mensaje + reset + "\n");
     }
 
     public void print(String mensaje) {
-        System.out.print(green + mensaje + reset + "\n");
+        System.out.print(green + ">> " + mensaje + reset + "\n");
     }
 
 }

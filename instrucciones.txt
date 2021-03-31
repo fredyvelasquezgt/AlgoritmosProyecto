@@ -18,6 +18,9 @@ COSAS A TOMAR EN CUENTA
 - SETQ -> Crear variables
     (setQ <nombre> <valor> )
 
+
+// LISTAS
+
 - FIRST -> Devuelve el primer elemento en una lista
     (fist <lista>) >> primer item
 
@@ -30,9 +33,6 @@ COSAS A TOMAR EN CUENTA
 
 - NTH -> Devuelve el N elemento de la lista
     (nth <expr> <lista>) >> item
-
-
-// LISTAS
 
 - CONS -> agrega un elemento al principio de una lista y la regresa
     (const <expr> <lista>) >> lista

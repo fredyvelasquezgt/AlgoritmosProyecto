@@ -1,4 +1,3 @@
-import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -31,19 +30,23 @@ public class Interprete {
             String tempInstruccion = sc.nextLine().toLowerCase();
             instruccion += " " + tempInstruccion;
 
-            int parentesisApertura = contarCaracteres(instruccion, '(');
-            int parentesisCierre = contarCaracteres(instruccion, ')');
+            if (instruccion.equals(" (exit)")) {
+                estado = false;
+            } else {
+                int parentesisApertura = contarCaracteres(instruccion, '(');
+                int parentesisCierre = contarCaracteres(instruccion, ')');
 
-            // Ver si se ha completado la intruccion
-            if (parentesisApertura == parentesisCierre) {
+                // Ver si se ha completado la intruccion
+                if (parentesisApertura == parentesisCierre) {
 
-                if (parentesisCierre > 0) {
-                    evaluar(instruccion);
-                } else {
-                    vista.prinrErr(">> [!] Las intrucciones deben iniciar con '(' y finalizar con ')'");
+                    if (parentesisCierre > 0) {
+                        evaluar(instruccion);
+                    } else {
+                        vista.prinrErr("[!] Las intrucciones deben iniciar con '(' y finalizar con ')'");
+                    }
+
+                    instruccion = "";
                 }
-
-                instruccion = "";
             }
 
         }
@@ -61,41 +64,348 @@ public class Interprete {
         instruccion = instruccion.trim();
         instruccion = instruccion.substring(0, instruccion.length() - 1);
         instruccion = instruccion.substring(1);
-
-        // Preparar la cadena con cada comando
-        // String[] lista = instruccion.split("(?=\\())");
-
         instruccion = instruccion.replace("'(", "-");
+
         String[] lista = instruccion.split("(?=\\()|(?=-)");
+
+        // Descomentar para ver como estan ordenados los comandos
+        // for (int i = 0; i < lista.length; i++) {
+        // String tempOrden = lista[i].replace("-", "'(");
+
+        // System.out.println(tempOrden);
+        // }
+
         for (int i = 0; i < lista.length; i++) {
 
-            String comando = lista[i];
-            comando = comando.replace("-", "'(");
+            String orden = lista[i];
+            orden = orden.replace("-", "'(");
 
+            // Agregar cada comando a una lista
+            String[] comando = orden.split(" ");
 
-            // Descomentar para ver como estan ordenados los comandos
-            // System.out.println(comando);
+            // Ver cual es el comando principal
+            switch (comando[0]) {
 
-            // Ver el comando principal
-            switch (comando.split(" ")[0]) {
-
-            // Variables
-            case "exit":
-                break;
+            // VARIABLES
 
             case "help":
                 break;
 
-            case "write":
+            case "write": // Imprime una expresión por consola
+
+                // Ver que tipo de expresión va a imprimir
+                try {
+
+                    if (comando[1].split("")[0].equals("'")) { // Texto
+                        vista.print(comando[1].substring(1));
+
+                    } else if (isNumeric(comando[1])) { // Es un numero
+                        vista.print(comando[1]);
+                    } else { // Variable
+                        Boolean existe = false;
+                        String mensaje = "";
+                        for (Variable variable : variables) {
+                            if (variable.getNombre().equals(comando[1])) {
+                                existe = true;
+                                mensaje += variable.getValor() + " ";
+                            }
+                        }
+
+                        vista.print(mensaje);
+
+                        if (!existe)
+                            vista.prinrErr("[!] " + comando[1] + " no esta definido como variable o funcion");
+                    }
+                } catch (Exception e) {
+
+                    // Ir a traer la siguiente linea del comando
+                    orden = lista[i + 1];
+                    orden = orden.replace("-", "'(");
+                    comando = orden.split(" ");
+
+                    if (comando[0].split("")[0].equals("'")) // texto - en forma de lista
+                        vista.print(orden.trim().substring(1));
+
+                    if (comando[0].split("")[0].equals("(")) { // Lista
+
+                        // Limpiar lista
+                        orden = orden.substring(0, orden.length() - 1);
+                        orden = orden.substring(1);
+                        String[] elementos = orden.split(" ");
+
+                        String mensaje = "";
+
+                        for (int j = 0; j < elementos.length; j++) {
+
+                            // Ver si que tipo de elemento hay en la lista
+                            if (elementos[j].split("")[0].equals("'")) { // texto
+                                mensaje += elementos[j].substring(1) + " ";
+                            } else if (isNumeric(elementos[j])) { // Expresión posfix
+                                mensaje += " " + elementos[j];
+                            } else { // Variable
+                                Boolean existe = false;
+                                for (Variable variable : variables) {
+                                    if (variable.getNombre().equals(elementos[j])) {
+                                        existe = true;
+                                        mensaje += variable.getValor() + " ";
+                                    }
+                                }
+
+                                if (!existe)
+                                    vista.prinrErr("[!] " + comando[1] + " no esta definido como variable o funcion");
+
+                            }
+
+                        }
+
+                        vista.print(mensaje);
+
+                    }
+                }
+
                 break;
 
-            case "setq":
+            case "setq": // Permite guardar y editar variables
+
+                String nombre = comando[1];
+
+                // Comprobar si la variable ya existe previamente
+                boolean existeVariable = false;
+                Variable variableExistente = null;
+                for (Variable variable : variables) {
+                    if (variable.getNombre().equals(nombre)) {
+                        existeVariable = true;
+                        variableExistente = variable;
+
+                    }
+                }
+                // Ver que tipo de expresión se guardara en la variable
+                try {
+
+                    if (comando[2].split("")[0].equals("'")) { // Texto
+
+                        if (existeVariable) {
+                            variableExistente.setValor(comando[2].trim().substring(1));
+                        } else {
+                            variables.add(new Variable(nombre, comando[2].trim().substring(1)));
+
+                        }
+
+                    } else if (isNumeric(comando[2])) { // Es un numero
+                        if (existeVariable) {
+                            variableExistente.setValor(comando[2].trim());
+                        } else {
+                            variables.add(new Variable(nombre, comando[2].trim()));
+                        }
+
+                    } else { // Variable
+                        Boolean existe = false;
+                        for (Variable variable : variables) {
+                            if (variable.getNombre().equals(comando[2])) {
+                                existe = true;
+                                if (existeVariable) {
+                                    variableExistente.setValor(variable.getValor());
+                                } else {
+                                    variables.add(new Variable(nombre, variable.getValor()));
+                                }
+                            }
+                        }
+
+                        if (!existe)
+                            vista.prinrErr("[!] " + comando[2] + " no esta definido como variable o funcion");
+                    }
+
+                } catch (Exception e) {
+                    // Ir a traer la siguiente linea del comando
+                    orden = lista[i + 1];
+                    orden = orden.replace("-", "'(");
+                    comando = orden.split(" ");
+
+                    if (comando[0].split("")[0].equals("'")) // texto - en forma de lista
+                        if (existeVariable) {
+                            variableExistente.setValor(orden.trim().substring(1));
+                        } else {
+                            variables.add(new Variable(nombre, orden.trim().substring(1)));
+                        }
+
+                    if (comando[0].split("")[0].equals("(")) { // Lista
+
+                        // Limpiar lista
+                        orden = orden.substring(0, orden.length() - 1);
+                        orden = orden.substring(1);
+                        String[] elementos = orden.split(" ");
+
+                        String mensaje = "";
+
+                        for (int j = 0; j < elementos.length; j++) {
+
+                            // Ver si que tipo de elemento hay en la lista
+                            if (elementos[j].split("")[0].equals("'")) { // texto
+                                mensaje += elementos[j].substring(1) + " ";
+                            } else if (isNumeric(elementos[j])) { // Expresión posfix
+                                mensaje += elementos[j] + " ";
+                            } else { // Variable
+                                Boolean existe = false;
+                                for (Variable variable : variables) {
+                                    if (variable.getNombre().equals(elementos[j])) {
+                                        existe = true;
+                                        mensaje += variable.getValor() + " ";
+                                    }
+                                }
+
+                                if (!existe)
+                                    vista.prinrErr("[!] " + comando[1] + " no esta definido como variable o funcion");
+
+                            }
+
+                        }
+
+                        if (existeVariable) {
+                            variableExistente.setValor(mensaje);
+                        } else {
+                            variables.add(new Variable(nombre, mensaje));
+                        }
+
+                    }
+                }
+
                 break;
 
-            case "first":
-                break;
+            // LISTAS
 
-            case "rest":
+            case "first": // Devuelve el primer elemento de una lista
+
+                // Ver que tipo de lista es
+                try {// Si es una lista dentro de una variable
+
+                    String tempNombre = comando[1];
+                    for (Variable variable : variables) {
+                        if (variable.getNombre().equals(tempNombre)) {
+                            if (variable.getValor().split(" ").length > 0) {
+                                vista.print(variable.getValor().split(" ")[0]);
+                                break;
+                            } else {
+                                vista.prinrErr("[!] La variable " + tempNombre + " no es una lista");
+                                break;
+                            }
+                        }
+                    }
+
+                } catch (Exception e) { // Si se esta creando la lista
+                    // Ir a traer la siguiente linea del comando
+                    orden = lista[i + 1];
+                    orden = orden.replace("-", "'(");
+                    comando = orden.split(" ");
+
+                    if (comando[0].split("")[0].equals("'")) {// texto - en forma de lista
+                        orden = orden.trim().substring(2);
+                        orden = orden.substring(0, orden.length() - 1);
+                        vista.print(orden.split(" ")[0]);
+
+                    } else if (comando[0].split("")[0].equals("(")) { // Lista
+
+                        // Limpiar lista
+                        orden = orden.substring(0, orden.length() - 1);
+                        orden = orden.substring(1);
+                        String elemento = orden.split(" ")[0];
+
+                        // Ver que tipo de elemento hay en la lista
+                        if (elemento.split("")[0].equals("'")) { // texto
+                            vista.print(elemento.substring(1));
+
+                        } else if (isNumeric(elemento)) { // Expresión posfix
+                            vista.print(elemento);
+                            break;
+
+                        } else { // Variable
+                            Boolean existe = false;
+                            for (Variable variable : variables) {
+                                if (variable.getNombre().equals(elemento)) {
+                                    existe = true;
+                                    vista.print(variable.getValor());
+                                    break;
+                                }
+                            }
+
+                            if (!existe) {
+                                vista.prinrErr("[!] " + elemento + " no esta definido como variable o funcion");
+                            }
+
+                        }
+
+                    }
+                }
+
+                break;
+            case "rest": // Devuelve una lista sin el primer elemento
+                // Ver que tipo de lista es
+                try {// Si es una lista dentro de una variable
+
+                    String tempNombre = comando[1];
+                    String tempLista = "";
+                    for (Variable variable : variables) {
+                        if (variable.getNombre().equals(tempNombre)) {
+                            if (variable.getValor().split(" ").length > 0) {
+
+                                for (int j = 0; j < variable.getValor().split(" ").length; j++) {
+                                    if (j != 0) {
+                                        tempLista += variable.getValor().split(" ")[j];
+                                    }
+                                }
+                                break;
+                            } else {
+                                vista.prinrErr("[!] La variable " + tempNombre + " no es una lista");
+                                break;
+                            }
+                        }
+                    }
+                    vista.print("(" + tempLista + ")");
+
+                } catch (Exception e) { // Si se esta creando la lista
+                    // Ir a traer la siguiente linea del comando
+                    orden = lista[i + 1];
+                    orden = orden.replace("-", "'(");
+                    comando = orden.split(" ");
+
+                    if (comando[0].split("")[0].equals("'")) {// texto - en forma de lista
+                        orden = orden.trim().substring(2);
+                        orden = orden.substring(0, orden.length() - 1);
+                        vista.print(orden.split(" ")[0]);
+
+                    } else if (comando[0].split("")[0].equals("(")) { // Lista
+
+                        // Limpiar lista
+                        orden = orden.substring(0, orden.length() - 1);
+                        orden = orden.substring(1);
+                        String elemento = orden.split(" ")[0];
+
+                        // Ver que tipo de elemento hay en la lista
+                        if (elemento.split("")[0].equals("'")) { // texto
+                            vista.print(elemento.substring(1));
+
+                        } else if (isNumeric(elemento)) { // Expresión posfix
+                            vista.print(elemento);
+                            break;
+
+                        } else { // Variable
+                            Boolean existe = false;
+                            for (Variable variable : variables) {
+                                if (variable.getNombre().equals(elemento)) {
+                                    existe = true;
+                                    vista.print(variable.getValor());
+                                    break;
+                                }
+                            }
+
+                            if (!existe) {
+                                vista.prinrErr("[!] " + elemento + " no esta definido como variable o funcion");
+                            }
+
+                        }
+
+                    }
+                }
+
                 break;
 
             case "second":
@@ -106,8 +416,6 @@ public class Interprete {
 
             case "nth":
                 break;
-
-            // Listas
 
             case "cons":
                 break;
@@ -124,12 +432,12 @@ public class Interprete {
             case "reverse":
                 break;
 
-            // Funciones
+            // FUNCIONES
 
             case "defun":
                 break;
 
-            // Condicionales
+            // CONDICIONALES
 
             case "ecuals":
                 break;
@@ -140,7 +448,7 @@ public class Interprete {
             case "cond":
                 break;
 
-            // Predicados
+            // PREDICADOS
 
             case "null":
                 break;
@@ -157,14 +465,7 @@ public class Interprete {
 
     }
 
-    /*
-     * Guarda una variable en el programa
-     * 
-     * @param comando
-     */
-    public void guardar(String nombre, String valor) {
-
-    }
+    // UTILIDADES
 
     /*
      * método para calcular el número de veces que se repite un carácter en un
@@ -182,6 +483,26 @@ public class Interprete {
             posicion = cadena.indexOf(caracter, posicion + 1);
         }
         return contador;
+    }
+
+    /**
+     * Valida si un texto es un numero o no
+     * 
+     * @param string
+     * @return True si es un numero y false si no
+     */
+    public static boolean isNumeric(String string) {
+
+        if (string == null || string.equals("")) {
+            return false;
+        }
+
+        try {
+            Integer.parseInt(string);
+            return true;
+        } catch (NumberFormatException e) {
+        }
+        return false;
     }
 
 }
