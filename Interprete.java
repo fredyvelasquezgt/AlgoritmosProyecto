@@ -88,6 +88,65 @@ public class Interprete {
 
             // VARIABLES
             case "help":
+                vista.print(" :: COMANDOS DISPONIBLES :: \n");
+
+                vista.print("VARIABLES: ");
+                vista.print(" - exit: Finaliza el programa");
+                vista.print("       (exit)");
+
+                vista.print(" - help: Muestra los comandos disponibles");
+                vista.print("       (help)");
+
+                vista.print(" - write: imprime un mensaje en consola");
+                vista.print("       (write <expr>)");
+
+                vista.print(" - setq: Crea o modifica una variable");
+                vista.print("       (setq <nombre> <valor>)\n");
+
+                vista.print("LISTAS: ");
+                vista.print(" - first: Devuelve el primer elemento de una lista");
+                vista.print("       (first <lista>)");
+
+                vista.print(" - second, thirtd, nth: Devuelve n elemento de una lista");
+                vista.print("       (second <lista>) >> segundo elemento");
+                vista.print("       (thirtd <lista>) >> tercer elemento");
+                vista.print("       (nth n <lista>) >> n elemento");
+
+                vista.print(" - cons: Agrega un elemento al principio de una lista");
+                vista.print("       (cons <expr> <lista>)");
+
+                vista.print(" - append: Devuelve la union de dos listas");
+                vista.print("       (append <lista1> <lista2>)");
+
+                vista.print(" - list: Construye una lista con los elementos que recibe");
+                vista.print("       (list <expr1> <expr2> ... <exprN>)");
+
+                vista.print(" - last: Devuelve el ultimo elemento de una lista");
+                vista.print("       (last <lista>)\n");
+
+                vista.print("FUNCIONES: ");
+                vista.print(" - defun: Define una funcion");
+                vista.print("       (defun <nombre> (<parametros>) (<logica>))\n");
+
+                vista.print("CONDICIONALES: ");
+                vista.print(" - ecuals: Devuleve T o nil si dos expresiones son iguales");
+                vista.print("       (ecuals <expr1> <expr2>)");
+
+                vista.print(" - eval:  Devuleve el valor de 'expr' (operacion)");
+                vista.print("       (eval <expr>)");
+
+                vista.print(" - cond: evalua todas sus condiciones y devulve la primera que encuentre T");
+                vista.print("       (cond (<expr> <mensaje>))\n");
+
+                vista.print("PREDICADOS: ");
+                vista.print(" - null: Devuelve T si es null (nill) y nil si no");
+                vista.print("       (null <expr>)");
+
+                vista.print(" - atom: Devuelve T si es un atomo y nil si no");
+                vista.print("       (atom <expr>)");
+
+                vista.print(" - numberp: Devuelve T si es un numero y nil si no");
+                vista.print("       (numberp <expr>)\n");
 
                 break;
 
